@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Form,HTTPException
+from fastapi import FastAPI,Form,HTTPException,EmailStr
 from pydantic import BaseModel,Field
 from typing import List,Set
 from pydantic import HttpUrl
@@ -81,6 +81,11 @@ class Numbers(BaseModel):
             raise HTTPException(status_code=400, detail="Division by zero is not allowed")
         return self.a / self.b
    
+class Student(BaseModel):
+    name: str
+    age: int
+    email: EmailStr
+    
     
 app = FastAPI()
     
@@ -127,3 +132,20 @@ def calculation(a: float, b: float):
         "multiply": numbers.multiply(),
         "divide": numbers.divide()
     }
+    
+    
+@app.post('/addstudent')
+def add_student(student: Student):
+    return {"student": student}
+
+@app.get('/students/{name}')
+def get_student(name: str):
+    return {"student": name}
+
+@app.put('/students/{id}')
+def update_student(id: int, student: Student):
+    return {"id": id, "student": student}
+
+@app.delete('/students/{id}')
+def delete_student(id: int):
+    return {"id": id, "message": "Student deleted successfully"}
