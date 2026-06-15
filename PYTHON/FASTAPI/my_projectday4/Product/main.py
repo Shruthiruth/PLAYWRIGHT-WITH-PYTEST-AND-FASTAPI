@@ -15,6 +15,22 @@ def get_db(): #get session for database --- get access to database
         yield db
     finally:
         db.close()
+        
+@app.delete('/product/{id}')
+def delete_product(id:int, db : Session = Depends(get_db)):
+    db.query(models.Product).filter(models.Product.id == id).delete(synchronize_session=False)
+    db.commit()
+    return {"product": f"Product with id {id} has been deleted successfully."}
+
+@app.get('/products')
+def get_products(db : Session = Depends(get_db)):
+    products = db.query(models.Product).all()
+    return {"products": products}
+
+@app.get('/product/{id}')
+def get_productby_id(id:int, db : Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == id).first()
+    return {"product": product}
 
 @app.post('/product')
 def add_product(request: schemas.Product, db : Session = Depends(get_db)):
@@ -22,4 +38,13 @@ def add_product(request: schemas.Product, db : Session = Depends(get_db)):
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
-    return {"product": request}
+    return {"product": new_product}
+
+@app.put('/product/{id}')
+def update_product(id:int, request: schemas.Product, db : Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == id)
+    if not product.first():
+        return {"product": f"Product with id {id} does not exist."}
+    product.update(request.dict())
+    db.commit()
+    return {"product": f"Product with id {id} has been updated successfully."}
