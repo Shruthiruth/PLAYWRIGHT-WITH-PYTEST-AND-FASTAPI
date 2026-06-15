@@ -1,11 +1,25 @@
 from fastapi import FastAPI
+from fastapi.params import Depends
+from sqlalchemy.orm import Session
 from .import schemas
 from .import models
-from .database import engine
+from .database import engine, SessionLocal
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
 
+
+def get_db(): #get session for database --- get access to database
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 @app.post('/product')
-def add_product(request: schemas.Product):
+def add_product(request: schemas.Product, db : Session = Depends(get_db)):
+    new_product = models.Product(name=request.name, price=request.price, description=request.description)
+    db.add(new_product)
+    db.commit()
+    db.refresh(new_product)
     return {"product": request}
