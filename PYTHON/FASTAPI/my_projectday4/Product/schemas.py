@@ -7,3 +7,10 @@ class Product(BaseModel):
     description: str = None
     
     
+class ProductResponse(BaseModel):
+    name: str
+    description: str
+    
+
+    class Config:
+        orm_mode = True
