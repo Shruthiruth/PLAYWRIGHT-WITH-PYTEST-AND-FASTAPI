@@ -6,11 +6,23 @@ class Product(BaseModel):
     price: int
     description: str = None
     
-    
+class SellerResponse(BaseModel):
+    username: str
+    email: str
+
+    class Config:
+        from_attributes = True
+        
 class ProductResponse(BaseModel):
     name: str
     description: str
-    
+    seller: SellerResponse
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+        
+class Seller(BaseModel):
+    username: str
+    email: str
+    password: str
+    
