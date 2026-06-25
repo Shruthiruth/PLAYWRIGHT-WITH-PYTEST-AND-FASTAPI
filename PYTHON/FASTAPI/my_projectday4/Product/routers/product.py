@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi.params import Depends
 from ..database import get_db
 from .. import models, schemas
-
+from ..routers.login import get_current_user
 
 router = APIRouter(
     tags=["Products"],
@@ -18,7 +18,7 @@ def delete_product(id:int, db : Session = Depends(get_db)):
     return {"product": f"Product with id {id} has been deleted successfully."}
 
 @router.get('/', response_model=List[schemas.ProductResponse])
-def get_products(db : Session = Depends(get_db)):
+def get_products(db : Session = Depends(get_db),current_user: schemas.Seller = Depends(get_current_user)):
     products = db.query(models.Product).all()
     return products
 

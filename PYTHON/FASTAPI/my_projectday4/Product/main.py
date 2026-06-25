@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from .import models
 from .database import engine
-from .routers import product , seller
+from .routers import product , seller , login
 
 app = FastAPI(
     
@@ -22,6 +22,7 @@ app = FastAPI(
 )
 app.include_router(product.router) #include the product router to the main app
 app.include_router(seller.router) #include the seller router to the main app
+app.include_router(login.router) #include the login router to the main app
 models.Base.metadata.create_all(bind=engine) #create the database tables based on the models defined in models.py
 
 
